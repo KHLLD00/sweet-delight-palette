@@ -191,7 +191,7 @@ function Index() {
             </div>
           </div>
           <div className="hero-photo reveal">
-            <img src={heroAsset.url} alt="Pink buttercream birthday cake with butterfly toppers by Ease Cakes" width={1440} height={1920} />
+            <img src={heroImg} alt="Pink buttercream birthday cake with butterfly toppers by Ease Cakes" width={1440} height={1920} />
             <span className="hero-tag">
               <span className="dot" />
               Freshly baked, made to order
