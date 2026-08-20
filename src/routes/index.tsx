@@ -1,9 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import donuts from "@/assets/donuts.jpg";
-import cake1 from "@/assets/cake1.jpg";
-import cake2 from "@/assets/cake2.jpg";
+import heroAsset from "@/assets/cake_4.jpg.asset.json";
+import g1 from "@/assets/cake_0.jpg.asset.json";
+import g2 from "@/assets/cake_5.jpg.asset.json";
+import g3 from "@/assets/cake_6.jpg.asset.json";
+import g4 from "@/assets/cake_7.jpg.asset.json";
+import g5 from "@/assets/cake_3.jpg.asset.json";
+import g6 from "@/assets/cake_8.jpg.asset.json";
+import g7 from "@/assets/cake_2.jpg.asset.json";
+import g8 from "@/assets/cake_9.jpg.asset.json";
+
+const GALLERY = [
+  { src: g1.url, alt: "Blue Police Secondary School graduation cake with cap topper", caption: "Graduation Celebration Cake" },
+  { src: g2.url, alt: "Blue and cream 'Happy Graduation' buttercream cake", caption: "Happy Graduation Cake" },
+  { src: g3.url, alt: "Orange and cream heart-shaped birthday cake", caption: "Heart Birthday Cake" },
+  { src: g4.url, alt: "Black buttercream birthday cake with pearls", caption: "Midnight Black Cake" },
+  { src: g5.url, alt: "Chocolate buttercream 70th birthday cake with gold pearls", caption: "Chocolate & Gold Cake" },
+  { src: g6.url, alt: "White buttercream birthday cake with gold pearls", caption: "Classic Cream & Gold" },
+  { src: g7.url, alt: "White cake decorated with fresh pink and orange flowers", caption: "Floral Celebration Cake" },
+  { src: g8.url, alt: "Boxed pink cake with money bouquet gift set", caption: "Gift Box & Bouquet Set" },
+];
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -171,10 +189,10 @@ function Index() {
             </div>
           </div>
           <div className="hero-photo reveal">
-            <img src={donuts} alt="Box of freshly made milky doughnuts by Ease Cakes" width={1024} height={1280} />
+            <img src={heroAsset.url} alt="Pink buttercream birthday cake with butterfly toppers by Ease Cakes" width={1440} height={1920} />
             <span className="hero-tag">
               <span className="dot" />
-              Fresh doughnuts, boxed today
+              Freshly baked, made to order
             </span>
           </div>
         </div>
@@ -189,20 +207,15 @@ function Index() {
           <p>A few recent bakes — every order is made to fit the occasion.</p>
         </div>
         <div className="gallery reveal">
-          <figure>
-            <img src={cake1} alt="Custom celebration cake with pink frosting" loading="lazy" width={1024} height={1280} />
-            <figcaption>Custom Celebration Cake</figcaption>
-          </figure>
-          <figure>
-            <img src={cake2} alt="Birthday cake and cupcakes boxed for delivery" loading="lazy" width={1024} height={1280} />
-            <figcaption>Cake &amp; Cupcake Box</figcaption>
-          </figure>
-          <figure>
-            <img src={donuts} alt="Box of milky doughnuts" loading="lazy" width={1024} height={1280} />
-            <figcaption>Milky Doughnuts</figcaption>
-          </figure>
+          {GALLERY.map((g) => (
+            <figure key={g.src}>
+              <img src={g.src} alt={g.alt} loading="lazy" width={1440} height={1920} />
+              <figcaption>{g.caption}</figcaption>
+            </figure>
+          ))}
         </div>
       </section>
+
 
       <Scallop />
 
