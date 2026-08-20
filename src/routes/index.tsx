@@ -189,10 +189,10 @@ function Index() {
             </div>
           </div>
           <div className="hero-photo reveal">
-            <img src={donuts} alt="Box of freshly made milky doughnuts by Ease Cakes" width={1024} height={1280} />
+            <img src={heroAsset.url} alt="Pink buttercream birthday cake with butterfly toppers by Ease Cakes" width={1440} height={1920} />
             <span className="hero-tag">
               <span className="dot" />
-              Fresh doughnuts, boxed today
+              Freshly baked, made to order
             </span>
           </div>
         </div>
@@ -207,20 +207,15 @@ function Index() {
           <p>A few recent bakes — every order is made to fit the occasion.</p>
         </div>
         <div className="gallery reveal">
-          <figure>
-            <img src={cake1} alt="Custom celebration cake with pink frosting" loading="lazy" width={1024} height={1280} />
-            <figcaption>Custom Celebration Cake</figcaption>
-          </figure>
-          <figure>
-            <img src={cake2} alt="Birthday cake and cupcakes boxed for delivery" loading="lazy" width={1024} height={1280} />
-            <figcaption>Cake &amp; Cupcake Box</figcaption>
-          </figure>
-          <figure>
-            <img src={donuts} alt="Box of milky doughnuts" loading="lazy" width={1024} height={1280} />
-            <figcaption>Milky Doughnuts</figcaption>
-          </figure>
+          {GALLERY.map((g) => (
+            <figure key={g.src}>
+              <img src={g.src} alt={g.alt} loading="lazy" width={1440} height={1920} />
+              <figcaption>{g.caption}</figcaption>
+            </figure>
+          ))}
         </div>
       </section>
+
 
       <Scallop />
 
