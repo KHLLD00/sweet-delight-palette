@@ -303,8 +303,7 @@ function Index() {
                 </div>
               </div>
               <div className="field-group">
-                <span className="block" style={{ display: "block" }} />
-                <label htmlFor="f-name">Fulfillment</label>
+                <label>Fulfillment</label>
                 <div className="radio-row">
                   <button
                     type="button"
