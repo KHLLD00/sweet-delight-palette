@@ -12,7 +12,7 @@ import g7 from "@/assets/cake_2.jpg";
 import g8 from "@/assets/cake_9.jpg";
 import g9 from "@/assets/cake_1.jpg";
 import logoImg from "@/assets/logo.jpg";
-import { canShareFiles, downloadBlob, generateReceiptPng, getNextOrderNumber, type ReceiptData } from "@/lib/receipt";
+import { downloadBlob, generateReceiptPng, getNextOrderNumber, type ReceiptData } from "@/lib/receipt";
 
 const GALLERY = [
   { src: g1, alt: "Blue Police Secondary School graduation cake with cap topper", caption: "Graduation Celebration Cake" },
@@ -191,23 +191,13 @@ function Index() {
     setReceipt(null);
   };
 
-  const shareOnWhatsApp = async () => {
+  const shareOnWhatsApp = () => {
     if (!receipt) return;
-    const shortText = `Hi Ease Cakes! I'd like to place order #${receipt.orderNumber}. I've attached my order receipt.`;
+    const shortText = `Hi Ease Cakes! I'd like to place order #${receipt.orderNumber}. I'm attaching my order receipt image in this chat — please check for it below.`;
     const filename = `ease-cakes-order-${receipt.orderNumber}.png`;
-    const file = new File([receipt.blob], filename, { type: "image/png" });
-
-    if (canShareFiles(file)) {
-      try {
-        await navigator.share({ files: [file], text: shortText, title: `Order #${receipt.orderNumber}` });
-        return;
-      } catch {
-        // user cancelled the share sheet, or it failed — fall through to the WhatsApp link fallback
-      }
-    }
 
     downloadBlob(receipt.blob, filename);
-    setMsg("Receipt saved — attach it in WhatsApp before sending your message.");
+    setMsg("Receipt downloaded — attach it in the WhatsApp chat that just opened.");
     window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(shortText)}`, "_blank", "noopener");
   };
 

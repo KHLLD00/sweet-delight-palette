@@ -427,11 +427,6 @@ export function getNextOrderNumber(): number {
   }
 }
 
-export function canShareFiles(file: File): boolean {
-  const nav = navigator as Navigator & { canShare?: (data?: ShareData) => boolean };
-  return typeof nav.canShare === "function" && !!navigator.share && nav.canShare({ files: [file] });
-}
-
 export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
