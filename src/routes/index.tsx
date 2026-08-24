@@ -11,6 +11,8 @@ import g6 from "@/assets/cake_8.jpg";
 import g7 from "@/assets/cake_2.jpg";
 import g8 from "@/assets/cake_9.jpg";
 import g9 from "@/assets/cake_1.jpg";
+import logoImg from "@/assets/logo.jpg";
+import { canShareFiles, downloadBlob, generateReceiptPng, getNextOrderNumber, type ReceiptData } from "@/lib/receipt";
 
 const GALLERY = [
   { src: g1, alt: "Blue Police Secondary School graduation cake with cap topper", caption: "Graduation Celebration Cake" },
@@ -96,6 +98,10 @@ function Index() {
   const [form, setForm] = useState({ name: "", phone: "", date: "", address: "", cake: "", notes: "" });
   const [msg, setMsg] = useState("");
 
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [receipt, setReceipt] = useState<{ url: string; blob: Blob; orderNumber: number } | null>(null);
+
   useEffect(() => {
     const els = rootRef.current?.querySelectorAll(".reveal");
     if (!els) return;
@@ -130,7 +136,15 @@ function Index() {
   const bump = (key: string, delta: number) =>
     setQty((prev) => ({ ...prev, [key]: Math.max(0, (prev[key] ?? 0) + delta) }));
 
-  const send = () => {
+  const hasItems = lines.length > 0;
+
+  const clearCart = () => {
+    setQty({});
+    setShowClearConfirm(false);
+    setMsg("");
+  };
+
+  const review = async () => {
     if (!form.name.trim() || !form.phone.trim()) {
       setMsg("Please add your name and phone number.");
       return;
@@ -143,19 +157,63 @@ function Index() {
       setMsg("Select at least one pastry or describe a cake request.");
       return;
     }
-    let text = `Hi Ease Cakes! I'd like to place an order.\n\n`;
-    text += `Name: ${form.name}\nPhone: ${form.phone}\n`;
-    if (form.date) text += `Needed by: ${form.date}\n`;
-    text += `Fulfillment: ${fulfil}\n`;
-    if (fulfil === "Delivery") text += `Address: ${form.address}\n`;
-    if (lines.length) {
-      text += `\nPastries:\n${lines.map((l) => `- ${l.text} = ${fmt(l.sub)}`).join("\n")}\nPastry Subtotal: ${fmt(total)}\n`;
-    }
-    if (form.cake.trim()) text += `\nCustom Cake Request:\n${form.cake}\n`;
-    if (form.notes.trim()) text += `\nNotes: ${form.notes}\n`;
 
-    setMsg("Opening WhatsApp with your order...");
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+    setMsg("");
+    setGenerating(true);
+    try {
+      const orderNumber = getNextOrderNumber();
+      const data: ReceiptData = {
+        orderNumber,
+        dateTime: new Date(),
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        fulfilment: fulfil,
+        address: form.address.trim() || undefined,
+        neededBy: form.date || undefined,
+        lines: lines.map((l) => ({ label: l.text, price: l.sub })),
+        cakeRequest: form.cake.trim() || undefined,
+        notes: form.notes.trim() || undefined,
+        subtotal: total,
+        total,
+      };
+      const blob = await generateReceiptPng(data, logoImg);
+      const url = URL.createObjectURL(blob);
+      setReceipt({ url, blob, orderNumber });
+    } catch {
+      setMsg("Couldn't generate the receipt — please try again.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const closeReceipt = () => {
+    if (receipt) URL.revokeObjectURL(receipt.url);
+    setReceipt(null);
+  };
+
+  const shareOnWhatsApp = async () => {
+    if (!receipt) return;
+    const shortText = `Hi Ease Cakes! I'd like to place order #${receipt.orderNumber}. I've attached my order receipt.`;
+    const filename = `ease-cakes-order-${receipt.orderNumber}.png`;
+    const file = new File([receipt.blob], filename, { type: "image/png" });
+
+    if (canShareFiles(file)) {
+      try {
+        await navigator.share({ files: [file], text: shortText, title: `Order #${receipt.orderNumber}` });
+        return;
+      } catch {
+        // user cancelled the share sheet, or it failed — fall through to the WhatsApp link fallback
+      }
+    }
+
+    downloadBlob(receipt.blob, filename);
+    setMsg("Receipt saved — attach it in WhatsApp before sending your message.");
+    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(shortText)}`, "_blank", "noopener");
+  };
+
+  const saveReceipt = () => {
+    if (!receipt) return;
+    downloadBlob(receipt.blob, `ease-cakes-order-${receipt.orderNumber}.png`);
   };
 
   return (
@@ -287,37 +345,6 @@ function Index() {
           <div className="order-grid reveal">
             <div>
               <div className="field-group">
-                <label htmlFor="f-name">Your Name</label>
-                <input
-                  id="f-name"
-                  type="text"
-                  placeholder="e.g. Amina Yusuf"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
-              </div>
-              <div className="field-row">
-                <div className="field-group">
-                  <label htmlFor="f-phone">Phone Number</label>
-                  <input
-                    id="f-phone"
-                    type="tel"
-                    placeholder="080..."
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  />
-                </div>
-                <div className="field-group">
-                  <label htmlFor="f-date">Needed By</label>
-                  <input
-                    id="f-date"
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="field-group">
                 <label>Fulfillment</label>
                 <div className="radio-row">
                   <button
@@ -349,6 +376,14 @@ function Index() {
                 </div>
               )}
 
+              <div className="items-head">
+                <label>Pastries</label>
+                {hasItems && (
+                  <button type="button" className="clear-cart-link" onClick={() => setShowClearConfirm(true)}>
+                    Clear Order
+                  </button>
+                )}
+              </div>
               <div>
                 {ITEMS.map((item, i) => (
                   <div className="item-card" key={item.name}>
@@ -418,15 +453,91 @@ function Index() {
                 Cakes are quoted separately once we see your request. Subtotal excludes delivery fee, confirmed on
                 WhatsApp.
               </small>
-              <button type="button" className="btn btn-solid" onClick={send}>
+
+              <div className="summary-contact">
+                <div className="field-group">
+                  <label htmlFor="f-name">Your Name</label>
+                  <input
+                    id="f-name"
+                    type="text"
+                    placeholder="e.g. Amina Yusuf"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  />
+                </div>
+                <div className="field-row">
+                  <div className="field-group">
+                    <label htmlFor="f-phone">Phone Number</label>
+                    <input
+                      id="f-phone"
+                      type="tel"
+                      placeholder="080..."
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    />
+                  </div>
+                  <div className="field-group">
+                    <label htmlFor="f-date">Needed By</label>
+                    <input
+                      id="f-date"
+                      type="date"
+                      value={form.date}
+                      onChange={(e) => setForm({ ...form, date: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <button type="button" className="btn btn-solid" onClick={review} disabled={generating}>
                 <WhatsAppIcon />
-                Send Order via WhatsApp
+                {generating ? "Preparing receipt..." : "Send Order via WhatsApp"}
               </button>
               <p className="form-msg">{msg}</p>
             </div>
           </div>
         </div>
       </section>
+
+      {showClearConfirm && (
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="clear-cart-title">
+          <div className="modal-card">
+            <h3 id="clear-cart-title">Clear your order?</h3>
+            <p>Are you sure you want to remove all items from your order?</p>
+            <div className="modal-actions">
+              <button type="button" className="btn btn-outline" onClick={() => setShowClearConfirm(false)}>
+                Cancel
+              </button>
+              <button type="button" className="btn btn-solid btn-danger" onClick={clearCart}>
+                Clear Order
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {receipt && (
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="receipt-title">
+          <div className="modal-card receipt-card">
+            <h3 id="receipt-title">Your order is ready 🎉</h3>
+            <p>Your order receipt has been prepared. Send it to Ease Cakes on WhatsApp to complete your order.</p>
+            <div className="receipt-preview">
+              <img src={receipt.url} alt={`Order receipt #${receipt.orderNumber}`} />
+            </div>
+            <div className="modal-actions modal-actions-col">
+              <button type="button" className="btn btn-solid" onClick={shareOnWhatsApp}>
+                <WhatsAppIcon />
+                Share Receipt on WhatsApp
+              </button>
+              <button type="button" className="btn btn-outline" onClick={saveReceipt}>
+                Save Receipt
+              </button>
+              <button type="button" className="modal-close-link" onClick={closeReceipt}>
+                Back to edit order
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer id="contact">
         <span className="wordmark">
@@ -438,6 +549,12 @@ function Index() {
           </a>
         </div>
         <p className="fine">Lokoja, Kogi State · Delivery or pickup · Payment confirms order</p>
+        <p className="designer-credit">
+          Designed by{" "}
+          <a href="https://khalid-usman.vercel.app/" target="_blank" rel="noopener noreferrer">
+            Khaleed ↗
+          </a>
+        </p>
       </footer>
     </div>
   );
