@@ -89,7 +89,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "Ease Cakes & Pastries, cakes and pastries in Lokoja.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://ease-cakes.vercel.app/" },
+      {
+        property: "og:image",
+        content: "https://ease-cakes.vercel.app/og-image.jpg",
+      },
+      { property: "og:image:alt", content: "Ease Cakes & Pastries" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Ease Cakes & Pastries" },
+      {
+        name: "twitter:description",
+        content: "Ease Cakes & Pastries, cakes and pastries in Lokoja.",
+      },
+      {
+        name: "twitter:image",
+        content: "https://ease-cakes.vercel.app/og-image.jpg",
+      },
+      { name: "twitter:image:alt", content: "Ease Cakes & Pastries" },
     ],
     links: [
       {
