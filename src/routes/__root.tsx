@@ -92,7 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:url", content: "https://ease-cakes.vercel.app/" },
       {
         property: "og:image",
-        content: "https://ease-cakes.vercel.app/og-image.jpg",
+        content: "https://raw.githubusercontent.com/KHLLD00/sweet-delight-palette/main/src/assets/logo.jpg",
       },
       { property: "og:image:alt", content: "Ease Cakes & Pastries" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -103,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         name: "twitter:image",
-        content: "https://ease-cakes.vercel.app/og-image.jpg",
+        content: "https://raw.githubusercontent.com/KHLLD00/sweet-delight-palette/main/src/assets/logo.jpg",
       },
       { name: "twitter:image:alt", content: "Ease Cakes & Pastries" },
     ],
