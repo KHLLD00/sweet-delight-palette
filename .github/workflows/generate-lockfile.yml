@@ -1,0 +1,35 @@
+name: Generate lockfile
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Generate lockfile
+        run: bun install
+
+      - name: Commit lockfile and remove temporary workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/generate-lockfile.yml
+          git add bun.lock .github/workflows/generate-lockfile.yml
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Regenerate lockfile without Lovable dependency"
+          git push
