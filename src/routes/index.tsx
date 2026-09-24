@@ -540,9 +540,9 @@ function Index() {
         </div>
         <p className="fine">Lokoja, Kogi State · Delivery or pickup · Payment confirms order</p>
         <p className="designer-credit">
-          Designed by{" "}
-          <a href="https://khalid-usman.vercel.app/" target="_blank" rel="noopener noreferrer">
-            Khaleed ↗
+          Powered by{" "}
+          <a href="https://kaytechwebsolutions.vercel.app" target="_blank" rel="noopener noreferrer">
+            Kaytech Web Solutions ↗
           </a>
         </p>
       </footer>
