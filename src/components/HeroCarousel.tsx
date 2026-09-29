@@ -9,9 +9,10 @@ type HeroSlide = {
 
 type HeroCarouselProps = {
   slides: HeroSlide[];
+  onImageClick?: (index: number) => void;
 };
 
-export function HeroCarousel({ slides }: HeroCarouselProps) {
+export function HeroCarousel({ slides, onImageClick }: HeroCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -61,11 +62,11 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
         </div>
       </div>
       <div className="hero-carousel-controls">
-        <button type="button" className="hero-carousel-button" onClick={() => emblaApi?.scrollPrev()} aria-label="Previous cake image">
+        <button type="button" className="hero-carousel-button" onClick={(event) => { event.stopPropagation(); emblaApi?.scrollPrev(); }} aria-label="Previous cake image">
           ‹
         </button>
         <span aria-hidden="true">Swipe to explore our bakes</span>
-        <button type="button" className="hero-carousel-button" onClick={() => emblaApi?.scrollNext()} aria-label="Next cake image">
+        <button type="button" className="hero-carousel-button" onClick={(event) => { event.stopPropagation(); emblaApi?.scrollNext(); }} aria-label="Next cake image">
           ›
         </button>
       </div>
