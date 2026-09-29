@@ -356,3 +356,5 @@ html{scroll-behavior:smooth;}
 .ec section{content-visibility:auto;contain-intrinsic-size:700px;}
 @media (max-width:840px){ .ec .hero-carousel{transform:none;} }
 @media (prefers-reduced-motion: reduce){ .ec .hero-carousel{transform:none;} .ec .hero-carousel-button{transition:none;} }
+
+@media (max-width:600px){ .ec .mobile-menu-toggle{display:flex;} }
