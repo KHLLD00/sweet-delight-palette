@@ -493,7 +493,7 @@ function Index() {
             <h3 id="clear-cart-title">Clear your order?</h3>
             <p>Are you sure you want to remove all items from your order?</p>
             <div className="modal-actions">
-              <button type="button" className="btn btn-outline" onClick={() => setShowClearConfirm(false)}>
+              <button ref={activeModal === "clear" ? modalCloseRef : undefined} type="button" className="btn btn-outline" onClick={() => setShowClearConfirm(false)}>
                 Cancel
               </button>
               <button type="button" className="btn btn-solid btn-danger" onClick={clearCart}>
