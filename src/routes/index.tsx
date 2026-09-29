@@ -513,7 +513,7 @@ function Index() {
               <img src={receipt.url} alt={`Order receipt #${receipt.orderNumber}`} />
             </div>
             <div className="modal-actions modal-actions-col">
-              <button type="button" className="btn btn-solid" onClick={shareOnWhatsApp}>
+              <button autoFocus type="button" className="btn btn-solid" onClick={shareOnWhatsApp}>
                 <WhatsAppIcon />
                 Continue on WhatsApp
               </button>
