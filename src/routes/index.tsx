@@ -12,6 +12,8 @@ import g7 from "@/assets/cake_2.jpg";
 import g8 from "@/assets/cake_9.jpg";
 import g9 from "@/assets/cake_1.jpg";
 import logoImg from "@/assets/logo.jpg";
+import { HeroCarousel } from "@/components/HeroCarousel";
+import { openWhatsAppOrder } from "@/lib/whatsapp";
 import { downloadBlob, generateReceiptPng, getNextOrderNumber, type ReceiptData } from "@/lib/receipt";
 
 const GALLERY = [
@@ -71,6 +73,8 @@ const ITEMS: Item[] = [
   },
 ];
 
+const HERO_SLIDES = [{ src: heroImg, alt: "Pink buttercream birthday cake with butterfly toppers by Ease Cakes", caption: "Butterfly Birthday Cake" }, ...GALLERY];
+
 const fmt = (n: number) => "₦" + n.toLocaleString();
 
 function Scallop() {
@@ -97,6 +101,7 @@ function Index() {
   const [fulfil, setFulfil] = useState<"Pickup" | "Delivery">("Pickup");
   const [form, setForm] = useState({ name: "", phone: "", date: "", address: "", cake: "", notes: "" });
   const [msg, setMsg] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -193,12 +198,10 @@ function Index() {
 
   const shareOnWhatsApp = () => {
     if (!receipt) return;
-    const shortText = `Hi Ease Cakes! I'd like to place order #${receipt.orderNumber}. I'm attaching my order receipt image in this chat — please check for it below.`;
-    const filename = `ease-cakes-order-${receipt.orderNumber}.png`;
-
-    downloadBlob(receipt.blob, filename);
-    setMsg("Receipt downloaded — attach it in the WhatsApp chat that just opened.");
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(shortText)}`, "_blank", "noopener");
+    const orderLines = lines.length ? lines.map((line) => `• ${line.text} — ${fmt(line.sub)}`).join("\n") : "• Custom cake request";
+    const message = [`Hi Ease Cakes! I'd like to place an order.`, `Order #${receipt.orderNumber}`, `Name: ${form.name.trim()}`, `Phone: ${form.phone.trim()}`, `Fulfillment: ${fulfil}`, form.address.trim() ? `Address: ${form.address.trim()}` : "", form.date ? `Needed by: ${form.date}` : "", "", "Order details:", orderLines, form.cake.trim() ? `Custom cake: ${form.cake.trim()}` : "", form.notes.trim() ? `Notes: ${form.notes.trim()}` : "", `Pastry subtotal: ${fmt(total)}`].filter(Boolean).join("\n");
+    openWhatsAppOrder(WHATSAPP, message);
+    setMsg("WhatsApp opened with your order details ready to send.");
   };
 
   const saveReceipt = () => {
@@ -212,10 +215,11 @@ function Index() {
         <span className="wordmark">
           Ease <span>Cakes</span> &amp; Pastries
         </span>
-        <nav>
-          <a href="#menu">Menu</a>
-          <a href="#gallery">Gallery</a>
-          <a href="#order">Order</a>
+        <button type="button" className="mobile-menu-toggle" aria-expanded={mobileMenuOpen} aria-controls="site-navigation" aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"} onClick={() => setMobileMenuOpen((open) => !open)}><span /><span /><span /></button>
+        <nav id="site-navigation" className={mobileMenuOpen ? "open" : ""}>
+          <a href="#menu" onClick={() => setMobileMenuOpen(false)}>Menu</a>
+          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>Gallery</a>
+          <a href="#order" onClick={() => setMobileMenuOpen(false)}>Order</a>
         </nav>
       </header>
 
@@ -231,20 +235,14 @@ function Index() {
             <div className="cta-row">
               <a className="btn btn-solid" href="#order">
                 <WhatsAppIcon />
-                Order Now
+                Start Your Order
               </a>
               <a className="btn btn-outline" href="#menu">
                 View Menu
               </a>
             </div>
           </div>
-          <div className="hero-photo reveal">
-            <img src={heroImg} alt="Pink buttercream birthday cake with butterfly toppers by Ease Cakes" width={1440} height={1920} />
-            <span className="hero-tag">
-              <span className="dot" />
-              Freshly baked, made to order
-            </span>
-          </div>
+          <HeroCarousel slides={HERO_SLIDES} />
         </div>
       </section>
 
@@ -336,17 +334,17 @@ function Index() {
             <div>
               <div className="field-group">
                 <label>Fulfillment</label>
-                <div className="radio-row">
+                <div className="radio-row" role="radiogroup" aria-label="Fulfillment method">
                   <button
                     type="button"
-                    className={`radio-pill${fulfil === "Pickup" ? " active" : ""}`}
+                    role="radio" aria-checked={fulfil === "Pickup"} className={`radio-pill${fulfil === "Pickup" ? " active" : ""}`}
                     onClick={() => setFulfil("Pickup")}
                   >
                     Pickup
                   </button>
                   <button
                     type="button"
-                    className={`radio-pill${fulfil === "Delivery" ? " active" : ""}`}
+                    role="radio" aria-checked={fulfil === "Delivery"} className={`radio-pill${fulfil === "Delivery" ? " active" : ""}`}
                     onClick={() => setFulfil("Delivery")}
                   >
                     Delivery
@@ -471,6 +469,7 @@ function Index() {
                     <input
                       id="f-date"
                       type="date"
+                      min={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
                       value={form.date}
                       onChange={(e) => setForm({ ...form, date: e.target.value })}
                     />
@@ -482,7 +481,7 @@ function Index() {
                 <WhatsAppIcon />
                 {generating ? "Preparing receipt..." : "Send Order via WhatsApp"}
               </button>
-              <p className="form-msg">{msg}</p>
+              <p className="form-msg" role="alert" aria-live="polite">{msg}</p>
             </div>
           </div>
         </div>
@@ -516,7 +515,7 @@ function Index() {
             <div className="modal-actions modal-actions-col">
               <button type="button" className="btn btn-solid" onClick={shareOnWhatsApp}>
                 <WhatsAppIcon />
-                Share Receipt on WhatsApp
+                Continue on WhatsApp
               </button>
               <button type="button" className="btn btn-outline" onClick={saveReceipt}>
                 Save Receipt
