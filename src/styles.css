@@ -283,6 +283,25 @@ html{scroll-behavior:smooth;}
   margin-bottom:1rem;
   text-shadow:0 3px 24px rgba(0,0,0,.45);
 }
+.ec .hero-content .hero-accent{
+  color:var(--pink);
+  font-style:italic;
+  position:relative;
+  display:inline-block;
+  text-shadow:0 3px 24px rgba(0,0,0,.42);
+}
+.ec .hero-content .hero-accent::after{
+  content:"";
+  position:absolute;
+  left:4%;
+  right:0;
+  bottom:-.06em;
+  height:2px;
+  background:currentColor;
+  opacity:.7;
+  transform:rotate(-2deg);
+  transform-origin:left center;
+}
 .ec .hero-content p.sub{
   color:rgba(255,255,255,.92);
   max-width:650px;
