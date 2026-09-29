@@ -250,10 +250,9 @@ function Index() {
         <div className="hero-overlay" aria-hidden="true" />
         <div className="hero-content reveal">
           <p className="hero-eyebrow">Est. 2023 · Lokoja, Kogi State</p>
-          <h1>Cakes &amp; pastries, made with ease.</h1>
+          <h1>Cakes &amp; pastries, made with <span className="hero-accent">ease.</span></h1>
           <p className="sub">
-            Celebration cakes, foil cakes, cupcakes, and a full pastry menu — samosas, spring rolls, meat pies,
-            doughnuts and more. Delivery or pickup across Kogi State.
+            Beautifully crafted cakes, pastries, and custom bakes for birthdays, weddings, graduations, and every moment worth celebrating.
           </p>
           <div className="cta-row">
             <a className="btn btn-solid" href="#order">
@@ -266,7 +265,7 @@ function Index() {
           </div>
         </div>
         <button type="button" className="hero-gallery-hint" onClick={() => openGallery(0)}>
-          Tap a cake image to explore the gallery
+          Swipe to explore our bakes
         </button>
       </section>
 
