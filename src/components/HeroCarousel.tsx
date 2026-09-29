@@ -46,7 +46,20 @@ export function HeroCarousel({ slides, onImageClick }: HeroCarouselProps) {
       <div className="hero-carousel-viewport" ref={emblaRef}>
         <div className="hero-carousel-container">
           {slides.map((slide, index) => (
-            <div className="hero-slide" key={slide.src}>
+            <div
+              className="hero-slide"
+              key={slide.src}
+              role={onImageClick ? "button" : undefined}
+              tabIndex={onImageClick ? 0 : undefined}
+              aria-label={onImageClick ? "Open gallery: " + slide.caption : undefined}
+              onClick={() => onImageClick?.(index)}
+              onKeyDown={(event) => {
+                if (onImageClick && (event.key === "Enter" || event.key === " ")) {
+                  event.preventDefault();
+                  onImageClick(index);
+                }
+              }}
+            >
               <img
                 src={slide.src}
                 alt={slide.alt}
