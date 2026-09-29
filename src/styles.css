@@ -399,6 +399,48 @@ html{scroll-behavior:smooth;}
 .ec .stepper button:hover{background:var(--caramel);color:#fff;}
 .ec .stepper span{min-width:16px;text-align:center;font-size:0.9rem;}
 
+.ec .btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.55rem;
+  min-height:44px;
+  padding:.72rem 1.05rem;
+  border:1px solid transparent;
+  border-radius:10px;
+  font:500 .82rem 'Work Sans',sans-serif;
+  letter-spacing:.04em;
+  text-decoration:none;
+  cursor:pointer;
+  transition:transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+}
+.ec .btn svg{
+  width:1.15em;
+  height:1.15em;
+  min-width:1.15em;
+  min-height:1.15em;
+  flex:0 0 1.15em;
+  display:block;
+}
+.ec .btn:hover{transform:translateY(-1px);}
+.ec .btn-solid{
+  background:var(--caramel);
+  color:#fff;
+  border-color:var(--caramel);
+}
+.ec .btn-solid:hover{background:var(--caramel-deep);border-color:var(--caramel-deep);}
+.ec .btn-outline{
+  background:transparent;
+  color:var(--ink);
+  border-color:rgba(59,31,26,.25);
+}
+.ec .btn-outline:hover{background:var(--cream-deep);border-color:var(--caramel);}
+.ec .cta-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.75rem;
+  align-items:center;
+}
 .ec .summary{position:sticky;top:5.5rem;background:#fff;border-radius:16px;border:1px solid rgba(236,30,140,0.22);padding:1.5rem 1.4rem;}
 .ec .summary h3{font-family:'Fraunces',serif;font-weight:600;font-size:1.1rem;margin-bottom:1rem;color:var(--ink);}
 .ec .summary-lines{min-height:24px;margin-bottom:0.8rem;}
