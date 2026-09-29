@@ -238,7 +238,7 @@ function Index() {
         <button type="button" className="mobile-menu-toggle" aria-expanded={mobileMenuOpen} aria-controls="site-navigation" aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"} onClick={() => setMobileMenuOpen((open) => !open)}><span /><span /><span /></button>
         <nav id="site-navigation" className={mobileMenuOpen ? "open" : ""}>
           <a href="#menu" onClick={() => setMobileMenuOpen(false)}>Menu</a>
-          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>Gallery</a>
+          <a href="#hero-gallery" onClick={(event) => { event.preventDefault(); setMobileMenuOpen(false); openGallery(0); }}>Gallery</a>
           <a href="#order" onClick={() => setMobileMenuOpen(false)}>Order</a>
         </nav>
       </header>
@@ -269,8 +269,6 @@ function Index() {
           Tap a cake image to explore the gallery
         </button>
       </section>
-
-      <Scallop />
 
       <Scallop />
 
