@@ -102,10 +102,12 @@ function Index() {
   const [form, setForm] = useState({ name: "", phone: "", date: "", address: "", cake: "", notes: "" });
   const [msg, setMsg] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [receipt, setReceipt] = useState<{ url: string; blob: Blob; orderNumber: number } | null>(null);
+  const [galleryIndex, setGalleryIndex] = useState(0);
 
   useEffect(() => {
     const els = rootRef.current?.querySelectorAll(".reveal");
@@ -124,6 +126,24 @@ function Index() {
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setGalleryOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [galleryOpen]);
+
+  const openGallery = (index: number) => {
+    setGalleryIndex(index);
+    setGalleryOpen(true);
+  };
 
   const lines = useMemo(() => {
     const out: { text: string; sub: number }[] = [];
@@ -224,46 +244,33 @@ function Index() {
       </header>
 
       <section className="hero">
-        <div className="hero-grid">
-          <div className="reveal">
-            <p className="hero-eyebrow">Est. 2023 · Lokoja, Kogi State</p>
-            <h1>Cakes &amp; pastries, made with ease.</h1>
-            <p className="sub">
-              Celebration cakes, foil cakes, cupcakes, and a full pastry menu — samosas, spring rolls, meat pies,
-              doughnuts and more. Delivery or pickup across Kogi State.
-            </p>
-            <div className="cta-row">
-              <a className="btn btn-solid" href="#order">
-                <WhatsAppIcon />
-                Start Your Order
-              </a>
-              <a className="btn btn-outline" href="#menu">
-                View Menu
-              </a>
-            </div>
-          </div>
-          <HeroCarousel slides={HERO_SLIDES} />
+        <div className="hero-background">
+          <HeroCarousel slides={HERO_SLIDES} onImageClick={openGallery} />
         </div>
+        <div className="hero-overlay" aria-hidden="true" />
+        <div className="hero-content reveal">
+          <p className="hero-eyebrow">Est. 2023 · Lokoja, Kogi State</p>
+          <h1>Cakes &amp; pastries, made with ease.</h1>
+          <p className="sub">
+            Celebration cakes, foil cakes, cupcakes, and a full pastry menu — samosas, spring rolls, meat pies,
+            doughnuts and more. Delivery or pickup across Kogi State.
+          </p>
+          <div className="cta-row">
+            <a className="btn btn-solid" href="#order">
+              <WhatsAppIcon />
+              Start Your Order
+            </a>
+            <a className="btn btn-outline" href="#menu">
+              View Menu
+            </a>
+          </div>
+        </div>
+        <button type="button" className="hero-gallery-hint" onClick={() => openGallery(0)}>
+          Tap a cake image to explore the gallery
+        </button>
       </section>
 
       <Scallop />
-
-      <section id="gallery">
-        <div className="section-head reveal">
-          <p className="eyebrow">A little taste</p>
-          <h2>From the Kitchen</h2>
-          <p>A few recent bakes — every order is made to fit the occasion.</p>
-        </div>
-        <div className="gallery reveal">
-          {GALLERY.map((g) => (
-            <figure key={g.src}>
-              <img src={g.src} alt={g.alt} loading="lazy" width={1440} height={1920} />
-              <figcaption>{g.caption}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
-
 
       <Scallop />
 
@@ -487,13 +494,52 @@ function Index() {
         </div>
       </section>
 
+      {galleryOpen && (
+        <div
+          className="gallery-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="gallery-modal-title"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setGalleryOpen(false);
+          }}
+        >
+          <div className="gallery-modal">
+            <div className="gallery-modal-header">
+              <div>
+                <p className="eyebrow">A little taste</p>
+                <h2 id="gallery-modal-title">From the Kitchen</h2>
+                <p>Explore a few of our recent bakes.</p>
+              </div>
+              <button type="button" className="gallery-modal-close" onClick={() => setGalleryOpen(false)} aria-label="Close gallery">
+                ×
+              </button>
+            </div>
+            <div className="gallery-modal-grid">
+              {HERO_SLIDES.map((g, index) => (
+                <button
+                  type="button"
+                  className={"gallery-modal-item" + (galleryIndex === index ? " selected" : "")}
+                  key={g.src}
+                  onClick={() => setGalleryIndex(index)}
+                  aria-label={"View " + g.caption}
+                >
+                  <img src={g.src} alt={g.alt} loading={index < 3 ? "eager" : "lazy"} width={1440} height={1920} />
+                  <span>{g.caption}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showClearConfirm && (
         <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="clear-cart-title">
           <div className="modal-card">
             <h3 id="clear-cart-title">Clear your order?</h3>
             <p>Are you sure you want to remove all items from your order?</p>
             <div className="modal-actions">
-              <button ref={activeModal === "clear" ? modalCloseRef : undefined} type="button" className="btn btn-outline" onClick={() => setShowClearConfirm(false)}>
+              <button autoFocus type="button" className="btn btn-outline" onClick={() => setShowClearConfirm(false)}>
                 Cancel
               </button>
               <button type="button" className="btn btn-solid btn-danger" onClick={clearCart}>
